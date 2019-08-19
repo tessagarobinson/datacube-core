@@ -12,6 +12,7 @@ from integration_tests.utils import prepare_test_ingestion_configuration
 import netCDF4
 
 
+@pytest.mark.netcdf
 @pytest.mark.timeout(20)
 @pytest.mark.parametrize('datacube_env_name', ('datacube',), indirect=True)
 @pytest.mark.usefixtures('default_metadata_type',

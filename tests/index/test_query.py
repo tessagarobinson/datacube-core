@@ -34,6 +34,7 @@ def test_parse_simple_expression():
     assert between_exp == parse_expressions('4<lat<6')
     assert between_exp == parse_expressions('6 > lat > 4')
     assert between_exp == parse_expressions('lat in range (4, 6)')
+    assert between_exp == parse_expressions('lat in [4, 6]')
 
 
 def test_parse_uri_expression():
@@ -62,6 +63,7 @@ def test_parse_dates():
         'time': Range(datetime(2014, 2, 1, tzinfo=tzutc()), datetime(2014, 3, 1, tzinfo=tzutc()))
     }
     assert implied_feb_2014 == parse_expressions('2014-02 < time < 2014-03')
+    assert implied_feb_2014 == parse_expressions('time in [2014-02, 2014-03]')
     assert implied_feb_2014 == parse_expressions('time in range (2014-02, 2014-03)')
 
 

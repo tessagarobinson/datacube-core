@@ -42,6 +42,7 @@ def testdata_dir(tmpdir, ingest_configs):
 ignore_me = pytest.mark.xfail(True, reason="get_data/get_description still to be fixed in Unification")
 
 
+@pytest.mark.netcdf
 @pytest.mark.usefixtures('default_metadata_type')
 @pytest.mark.parametrize('datacube_env_name', ('datacube', 's3aio_env'))
 def test_end_to_end(clirunner, index, testdata_dir, ingest_configs, datacube_env_name):

@@ -10,6 +10,25 @@ env:
   global:
     - CC_TEST_REPORTER_ID=56b5f09a9339c3ada591c94a6430823aee15e426fbcd9990e04fe936e40c8582
 
+# Hokay, what do we want to achieve
+#
+# Build:
+# - docs
+# - docker image
+#
+# Test
+# - Linting Checks
+# - Python 3.5
+# - Python 3.6
+# - Docker Image
+#
+# Deploy:
+# develop:
+# - opendatacube:latest
+# - Python Wheel to S3
+# tag:
+# - opendatacube:tag
+# - Python Wheel to PyPI
 language: python
 python:
   - "3.5"
@@ -37,9 +56,6 @@ addons:
       - libudunits2-0
 
 before_install:
-# Create a database for the integration tests.
-  - createdb agdcintegration
-
 # Check disk usage
   - df -h
   - df -i
@@ -73,6 +89,10 @@ install:
   - df -i
 
 before_script:
+# Create a database for the integration tests.
+  - createdb agdcintegration
+
+# Install Code Climate CLI
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build

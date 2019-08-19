@@ -62,7 +62,9 @@ def global_integration_cli_args():
 
 
 @pytest.fixture
-def datacube_env_name(request):
+def datacube_env_name(pytestconfig, request):
+    markers_arg = pytestconfig.getoption('-m')
+    print('markers passed from command line:', markers_arg)
     if hasattr(request, 'param'):
         return request.param
     else:
