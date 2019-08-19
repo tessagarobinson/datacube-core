@@ -17,6 +17,7 @@ EXPECTED_STORAGE_UNIT_DATA_SHAPE = (1, 40, 40)
 COMPLIANCE_CHECKER_NORMAL_LIMIT = 2
 
 
+@pytest.mark.netcdf
 @pytest.mark.timeout(20)
 @pytest.mark.parametrize('datacube_env_name', ('datacube',), indirect=True)
 @pytest.mark.usefixtures('default_metadata_type',
@@ -65,6 +66,7 @@ def test_full_ingestion(clirunner, index, tmpdir, example_ls5_dataset_paths, ing
     check_open_with_xarray(ds_path)
 
 
+@pytest.mark.s3aio
 @pytest.mark.timeout(20)
 @pytest.mark.parametrize('datacube_env_name', ('s3aio_env',), indirect=True)
 @pytest.mark.usefixtures('default_metadata_type',
@@ -103,6 +105,7 @@ def test_s3_full_ingestion(clirunner, index, tmpdir, example_ls5_dataset_paths, 
     check_data_with_api(index, len(valid_uuids))
 
 
+@pytest.mark.netcdf
 @pytest.mark.timeout(20)
 @pytest.mark.parametrize('datacube_env_name', ('datacube',), indirect=True)
 @pytest.mark.usefixtures('default_metadata_type',

@@ -248,9 +248,12 @@ def test_index_dataset_with_sources(index, default_metadata_type):
     for p in ('skip', 'ensure', 'verify'):
         index.datasets.add(child, sources_policy=p)
 
+datacube_and_s3_env = pytest.mark.parametrize(
+    'datacube_env_name', ['datacube', pytest.param('s3aio_env', marks=pytest.mark.s3aio)],
+    indirect=True)
 
 # Make sure that both normal and s3aio index can handle normal data locations correctly
-@pytest.mark.parametrize('datacube_env_name', ('datacube', 's3aio_env',), indirect=True)
+@datacube_and_s3_env
 def test_index_dataset_with_location(index: Index, default_metadata_type: MetadataType):
     first_file = Path('/tmp/first/something.yaml').absolute()
     second_file = Path('/tmp/second/something.yaml').absolute()
