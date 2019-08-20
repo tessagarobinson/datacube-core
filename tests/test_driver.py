@@ -1,15 +1,15 @@
+from collections import namedtuple
+
 import pytest
 import yaml
 
-from collections import namedtuple
-
-from datacube.drivers import new_datasource, reader_drivers, writer_drivers
 from datacube.drivers import index_drivers, index_driver_by_name
+from datacube.drivers import new_datasource, reader_drivers, writer_drivers
 from datacube.drivers.indexes import IndexDriverCache
+from datacube.model import MetadataType
 from datacube.storage import BandInfo
 from datacube.storage._rio import RasterDatasetDataSource
 from datacube.testutils import mk_sample_dataset
-from datacube.model import MetadataType
 
 S3_dataset = namedtuple('S3_dataset', ['macro_shape', 'numpy_type'])
 
@@ -64,6 +64,7 @@ def test_writer_drivers():
 def test_index_drivers():
     available_drivers = index_drivers()
     assert 'default' in available_drivers
+
 
 @pytest.mark.s3aio
 def test_s3aio_index_driver():
