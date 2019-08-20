@@ -1,6 +1,6 @@
 dist: xenial
 sudo: false  # Use the new travis docker based infrastructure
-
+language: python
 git:
   # We need a deeper depth for 'git descibe' to ensure
   # we can reach the last tagged version.
@@ -64,25 +64,6 @@ jobs:
             tags: true
             python: 3.6
             repo: opendatacube/datacube-core
-# Hokay, what do we want to achieve
-#
-# Build:
-# - docs
-# - docker image
-#
-# Test
-# - Linting Checks
-# - Python 3.5
-# - Python 3.6
-# - Docker Image
-#
-# Deploy:
-# develop:
-# - opendatacube:latest
-# - Python Wheel to S3
-# tag:
-# - opendatacube:tag
-# - Python Wheel to PyPI
 
 cache:
   directories:
