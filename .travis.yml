@@ -11,7 +11,7 @@ env:
     - CC_TEST_REPORTER_ID=56b5f09a9339c3ada591c94a6430823aee15e426fbcd9990e04fe936e40c8582
 
 matrix:
-  fast_finish: true
+  fast_finish: false
 
 jobs:
   include:
