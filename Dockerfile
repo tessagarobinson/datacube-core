@@ -57,7 +57,7 @@ RUN mkdir -p /opt/odc \
     && chmod +rwx /opt/odc \
     && mv $APPDIR/utils /opt/odc/ \
     && mv $APPDIR/docs /opt/odc/ \
-    && mv $APPDIR/docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
+    && mv $APPDIR/scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
     && rm -rf $APPDIR
 
 # Fix an issue with libcurl...
