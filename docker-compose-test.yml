@@ -1,12 +1,17 @@
+# Use this file to test a pre-built datacube-core docker image, tagged with opendatacube:local
+# with the following command:
+#
+#  docker-compose -f docker-compose-test.yml run --rm odc
+#
+
 version: '3'
 
 services:
   postgres:
     image: postgres:10.3
     environment:
-      - POSTGRES_USER=agdcintegration
+      - POSTGRES_USER=odcintegration
       - POSTGRES_PASSWORD=opendatacubepassword
-
 
   odc:
     image: opendatacube:local
@@ -14,11 +19,10 @@ services:
       - postgres
     environment:
       - DB_HOSTNAME=postgres
-      - DB_USERNAME=agdcintegration
+      - DB_USERNAME=odcintegration
       - DB_PASSWORD=opendatacubepassword
-      - DB_DATABASE=agdcintegration
-    command: pytest --maxfail=15 -m "not netcdf" -m "not s3aio" -r a --cov datacube --durations=5 /tmp/code/tests /tmp/code/integration_tests
+      - DB_DATABASE=odcintegration
+    working_dir: /tmp/code
+    command: pytest -m "not netcdf and not s3aio" -r a --cov datacube --durations=5 tests integration_tests --odc-config-file odcintegration-docker.conf
     volumes:
       - ./:/tmp/code
-
-
