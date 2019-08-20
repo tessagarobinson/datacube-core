@@ -1,12 +1,12 @@
 import imp
-import shutil
-from pathlib import Path
+
 import numpy
 import pytest
 import rasterio
+import shutil
+from pathlib import Path
 
 from datacube.api.query import query_group_by
-
 from integration_tests.utils import assert_click_command, prepare_test_ingestion_configuration
 
 PROJECT_ROOT = Path(__file__).parents[1]
@@ -33,7 +33,7 @@ def testdata_dir(tmpdir, ingest_configs):
     shutil.copytree(str(TEST_DATA), str(tmpdir / 'lbg'))
 
     for file in ingest_configs.values():
-        prepare_test_ingestion_configuration(tmpdir, tmpdir, INGESTER_CONFIGS/file,
+        prepare_test_ingestion_configuration(tmpdir, tmpdir, INGESTER_CONFIGS / file,
                                              mode='end2end')
 
     return tmpdir
@@ -41,10 +41,14 @@ def testdata_dir(tmpdir, ingest_configs):
 
 ignore_me = pytest.mark.xfail(True, reason="get_data/get_description still to be fixed in Unification")
 
+datacube_and_s3_env = pytest.mark.parametrize(
+    'datacube_env_name', ['datacube', pytest.param('s3aio_env', marks=pytest.mark.s3aio)],
+    indirect=True)
+
 
 @pytest.mark.netcdf
 @pytest.mark.usefixtures('default_metadata_type')
-@pytest.mark.parametrize('datacube_env_name', ('datacube', 's3aio_env'))
+@datacube_and_s3_env
 def test_end_to_end(clirunner, index, testdata_dir, ingest_configs, datacube_env_name):
     """
     Loads two dataset configurations, then ingests a sample Landsat 5 scene
@@ -259,7 +263,7 @@ def check_legacy_open(index):
 
     assert len(dss) == 1
 
-    dss = dss*2
+    dss = dss * 2
     sources = dc.group_datasets(dss, query_group_by('time'))
 
     gbox = data_array.geobox

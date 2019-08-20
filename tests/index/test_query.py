@@ -4,13 +4,12 @@ Module
 """
 
 from datetime import datetime
-
 from dateutil.tz.tz import tzutc
 from psycopg2.extras import NumericRange
 
-from datacube.index.fields import to_expressions
 from datacube.drivers.postgres._fields import SimpleDocField, RangeBetweenExpression, EqualsExpression, \
     NumericRangeDocField
+from datacube.index.fields import to_expressions
 from datacube.model import Range
 from datacube.ui import parse_expressions
 
@@ -30,10 +29,16 @@ def test_parse_simple_expression():
     assert {'platform': 'LANDSAT_8'} == parse_expressions('platform = LANDSAT_8')
     assert {'platform': 'LAND SAT_8'} == parse_expressions('platform = "LAND SAT_8"')
 
+
+def test_parse_legacy_range_expression():
     between_exp = {'lat': Range(4, 6)}
     assert between_exp == parse_expressions('4<lat<6')
     assert between_exp == parse_expressions('6 > lat > 4')
     assert between_exp == parse_expressions('lat in range (4, 6)')
+
+
+def test_parse_range_expression():
+    between_exp = {'lat': Range(4, 6)}
     assert between_exp == parse_expressions('lat in [4, 6]')
 
 
@@ -59,12 +64,14 @@ def test_parse_dates():
     assert march_2014 == parse_expressions('time = 2014-03')
     assert march_2014 == parse_expressions('time = 2014-3')
 
+
+def test_parse_legacy_date_ranges():
+    # This tests the old behaviour of date ranges, which we have removed because it is misleading.
+    # Usually '<' means exclusive less than, but we were including the start of the following period.
     implied_feb_2014 = {
         'time': Range(datetime(2014, 2, 1, tzinfo=tzutc()), datetime(2014, 3, 1, tzinfo=tzutc()))
     }
     assert implied_feb_2014 == parse_expressions('2014-02 < time < 2014-03')
-    assert implied_feb_2014 == parse_expressions('time in [2014-02, 2014-03]')
-    assert implied_feb_2014 == parse_expressions('time in range (2014-02, 2014-03)')
 
 
 def test_parse_date_ranges():
@@ -93,7 +100,7 @@ def test_parse_date_ranges():
     assert year_2014 == parse_expressions('time in 2014')
 
 
-def test_parse_multiple_simple_expressions():
+def test_parse_multiple_legacy_simple_expressions():
     # Multiple expressions in one command-line statement.
     # Mixed whitespace:
     between_exp = parse_expressions('platform=LS8 -4<lat<23.5 instrument="OTHER"')
@@ -102,8 +109,16 @@ def test_parse_multiple_simple_expressions():
     assert between_exp['lat'].begin == -4
 
 
+def test_parse_multiple_simple_expressions():
+    # Multiple expressions in one command-line statement.
+    # Mixed whitespace:
+    between_exp = parse_expressions('platform=LS8 lat in [-4, 23.5] instrument="OTHER"')
+    assert between_exp == {'platform': 'LS8', 'lat': Range(-4, 23.5), 'instrument': 'OTHER'}
+    # Range(x,y) is "equal" to (x, y). Check explicitly that it's a range:
+    assert between_exp['lat'].begin == -4
+
+
 def test_build_query_expressions():
     assert [EqualsExpression(_sat_field, "LANDSAT_8")] == to_expressions(_fields.get, platform="LANDSAT_8")
-    assert [
-               RangeBetweenExpression(_lat_field, 4, 23.0, _range_class=NumericRange)
-           ] == to_expressions(_fields.get, lat=Range(4, 23))
+    assert [RangeBetweenExpression(_lat_field, 4, 23.0, _range_class=NumericRange)
+            ] == to_expressions(_fields.get, lat=Range(4, 23))

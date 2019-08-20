@@ -2,29 +2,28 @@
 """
 Common methods for index integration tests.
 """
-import itertools
 import os
 from copy import copy, deepcopy
+
+import itertools
+import pytest
+import yaml
+from click.testing import CliRunner
 from datetime import timedelta
+from hypothesis import HealthCheck, settings
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
 
-import pytest
-import yaml
-from click.testing import CliRunner
-from hypothesis import HealthCheck, settings
-
 import datacube.scripts.cli_app
 import datacube.utils
+from datacube.config import LocalConfig
+from datacube.drivers.postgres import PostgresDb
 from datacube.drivers.postgres import _core
 from datacube.index import index_connect
 from datacube.index._metadata_types import default_metadata_type_docs
 from integration_tests.utils import _make_geotiffs, _make_ls5_scene_datasets, load_yaml_file, \
     GEOTIFF, load_test_products
-
-from datacube.config import LocalConfig
-from datacube.drivers.postgres import PostgresDb
 
 _SINGLE_RUN_CONFIG_TEMPLATE = """
 
@@ -40,8 +39,7 @@ NUM_TIME_SLICES = 3
 PROJECT_ROOT = Path(__file__).parents[1]
 CONFIG_SAMPLES = PROJECT_ROOT / 'docs' / 'config_samples'
 
-CONFIG_FILE_PATHS = [str(INTEGRATION_TESTS_DIR / 'agdcintegration.conf'),
-                     os.path.expanduser('~/.datacube_integration.conf')]
+DEFAULT_CONFIG_FILE = "odcintegration.conf"
 
 # Configure Hypothesis to allow slower tests, because we're testing datasets
 # and disk IO rather than scalar values in memory.  Ask @Zac-HD for details.
@@ -52,13 +50,36 @@ settings.register_profile(
 settings.load_profile('opendatacube')
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--odc-config-file", action="store", default=DEFAULT_CONFIG_FILE,
+        help="ODC config file for integration tests. Absolute path, or name within integration_tests/"
+    )
+
+
+def pytest_report_header(config):
+    return "ODC Config: " + str(_odc_config_paths(config))
+
+
 @pytest.fixture
-def global_integration_cli_args():
+def odc_config_file_paths(request):
+    return _odc_config_paths(request.config)
+
+
+def _odc_config_paths(config):
+    configpath = config.getoption('--odc-config-file')
+    if not configpath.startswith('/'):
+        configpath = str(INTEGRATION_TESTS_DIR / configpath)
+    return [configpath, os.path.expanduser('~/.datacube_integration.conf')]
+
+
+@pytest.fixture
+def global_integration_cli_args(odc_config_file_paths):
     """
     The first arguments to pass to a cli command for integration test configuration.
     """
     # List of a config files in order.
-    return list(itertools.chain(*(('--config', f) for f in CONFIG_FILE_PATHS)))
+    return list(itertools.chain(*(('--config', f) for f in odc_config_file_paths)))
 
 
 @pytest.fixture
@@ -72,14 +93,14 @@ def datacube_env_name(pytestconfig, request):
 
 
 @pytest.fixture
-def local_config(datacube_env_name):
+def local_config(datacube_env_name, odc_config_file_paths):
     """Provides a :class:`LocalConfig` configured with suitable config file paths.
 
     .. seealso::
 
         The :func:`integration_config_paths` fixture sets up the config files.
     """
-    return LocalConfig.find(CONFIG_FILE_PATHS, env=datacube_env_name)
+    return LocalConfig.find(odc_config_file_paths, env=datacube_env_name)
 
 
 @pytest.fixture
@@ -373,11 +394,11 @@ def example_ls5_nbar_metadata_doc():
 
 
 @pytest.fixture
-def clirunner(global_integration_cli_args, datacube_env_name):
+def clirunner(global_integration_cli_args, datacube_env_name, odc_config_file_paths):
     def _run_cli(opts, catch_exceptions=False,
                  expect_success=True, cli_method=datacube.scripts.cli_app.cli,
                  verbose_flag='-v'):
-        exe_opts = list(itertools.chain(*(('--config', f) for f in CONFIG_FILE_PATHS)))
+        exe_opts = list(itertools.chain(*(('--config', f) for f in odc_config_file_paths)))
         exe_opts += ['--env', datacube_env_name]
         if verbose_flag:
             exe_opts.append(verbose_flag)
