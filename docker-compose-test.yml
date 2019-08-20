@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:10.3
+    environment:
+      - POSTGRES_USER=agdcintegration
+      - POSTGRES_PASSWORD=opendatacubepassword
+
+
+  odc:
+    image: opendatacube:local
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOSTNAME=postgres
+      - DB_USERNAME=agdcintegration
+      - DB_PASSWORD=opendatacubepassword
+      - DB_DATABASE=agdcintegration
+    command: pytest --maxfail=15 -m "not netcdf" -m "not s3aio" -r a --cov datacube --durations=5 /tmp/code/tests /tmp/code/integration_tests
+    volumes:
+      - ./:/tmp/code
+
+
