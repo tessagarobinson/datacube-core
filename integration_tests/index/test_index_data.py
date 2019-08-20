@@ -5,13 +5,13 @@ Test database methods.
 Integration tests: these depend on a local Postgres instance.
 """
 import copy
-import datetime
 import sys
-from pathlib import Path
-from uuid import UUID
 
+import datetime
 import pytest
 from dateutil import tz
+from pathlib import Path
+from uuid import UUID
 
 from datacube.drivers.postgres import PostgresDb
 from datacube.index.exceptions import MissingRecordError
@@ -248,9 +248,11 @@ def test_index_dataset_with_sources(index, default_metadata_type):
     for p in ('skip', 'ensure', 'verify'):
         index.datasets.add(child, sources_policy=p)
 
+
 datacube_and_s3_env = pytest.mark.parametrize(
     'datacube_env_name', ['datacube', pytest.param('s3aio_env', marks=pytest.mark.s3aio)],
     indirect=True)
+
 
 # Make sure that both normal and s3aio index can handle normal data locations correctly
 @datacube_and_s3_env
