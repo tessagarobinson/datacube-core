@@ -90,7 +90,7 @@ install:
 
 before_script:
 # Create a database for the integration tests.
-  - createdb agdcintegration
+  - createdb odcintegration
 
 # Install Code Climate CLI
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
