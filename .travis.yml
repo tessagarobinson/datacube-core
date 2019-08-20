@@ -17,6 +17,7 @@ jobs:
   include:
     - stage: pretest
       before_script: skip
+      python: 3.6
       script: ./check-code.sh
 
     - stage: test
@@ -25,12 +26,14 @@ jobs:
       addons:
         postgresql: "9.5"
     - python: 3.6
-    - language: generic
-      before_script: skip
-      script:
-        - docker build -t opendatacube:local
-        - docker-compose -f docker-compose-test.yml run --rm odc
+
       # Docker
+    - language: generic
+      env: DOCKER_BUILD=true
+      before_install: skip
+      install: docker build -t opendatacube:local
+      before_script: skip
+      script: docker-compose -f docker-compose-test.yml run --rm odc
     - stage: deploy
       before_script: skip
       script: skip
