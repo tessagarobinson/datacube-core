@@ -16,9 +16,14 @@ matrix:
 jobs:
   include:
     - stage: pretest
-      before_script: skip
       python: 3.6
+
+      before_install: skip
+      install: skip
+      before_script: skip
       script: ./check-code.sh
+      after_script: skip
+      after_success: skip
 
     - stage: test
       python: 3.5

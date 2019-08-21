@@ -4,6 +4,7 @@ User configuration.
 """
 
 import os
+import configparser
 
 ENVIRONMENT_VARNAME = 'DATACUBE_CONFIG_PATH'
 #: Config locations in order. Properties found in latter locations override
@@ -43,7 +44,6 @@ _UNSET = object()
 
 
 def read_config(default_text=None):
-    import configparser
     config = configparser.ConfigParser()
     if default_text:
         config.read_string(default_text)

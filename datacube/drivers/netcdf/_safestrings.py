@@ -84,4 +84,3 @@ class SafeStringsDataset(_NC4DatasetProxy, netCDF4.Dataset):
     Unicode strings cause a bug in the NetCDF4 library which make them unreadable by
     some older software.
     """
-    pass

@@ -159,7 +159,7 @@ class S3LIO(object):
         sa.create(array_name, shape=array.shape, dtype=array.dtype)
         shared_array = sa.attach(array_name)
         shared_array[:] = array
-        results = self.pool.map(work_shard_array_to_s3, s3_keys, indices, repeat(array_name), repeat(s3_bucket))
+        self.pool.map(work_shard_array_to_s3, s3_keys, indices, repeat(array_name), repeat(s3_bucket))
 
         sa.delete(array_name)
 
@@ -238,7 +238,6 @@ class S3LIO(object):
         # 1. reproject query crs -> native crs
         # 2. regular_index native crs -> integer indexing
         # 3. get_data_unlabeled
-        pass
 
     # integer index data retrieval.
     # pylint: disable=too-many-locals
@@ -360,7 +359,7 @@ class S3LIO(object):
         size = [[s.stop - s.start for s in s] for s in data_slices]
         local_slices = [[slice(o, o + s) for o, s in zip(o, s)] for o, s in zip(origin, size)]
 
-        zipped = zip(keys, data_slices, local_slices, chunk_shapes, repeat(offset))
+        zip(keys, data_slices, local_slices, chunk_shapes, repeat(offset))
 
         self.pool.map(work_data_unlabeled, repeat(array_name), keys, data_slices, local_slices, chunk_shapes,
                       repeat(offset))

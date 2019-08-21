@@ -1,14 +1,16 @@
 import os
 import sys
 
+import subprocess
+
+import versioneer
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 print(sys.path)
-
-import versioneer
 
 current_dir = os.getcwd()
 os.chdir(os.path.dirname(versioneer.__file__))
@@ -27,7 +29,6 @@ os.chdir(current_dir)
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # -- RTD Debugging
-import subprocess
 
 subprocess.call('which java', shell=True)
 subprocess.call('java -version', shell=True)
@@ -112,7 +113,7 @@ intersphinx_mapping = {
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'xarray': ('https://xarray.pydata.org/en/stable/', None),
-#    'dask': ('https://dask.pydata.org/en/stable/', None),
+    'dask': ('https://dask.pydata.org/en/stable/', None),
 }
 
 graphviz_output_format = 'svg'

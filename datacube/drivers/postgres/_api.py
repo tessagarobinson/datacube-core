@@ -5,6 +5,7 @@
 
 # SQLAlchemy queries require "column == None", not "column is None" due to operator overloading:
 # pylint: disable=singleton-comparison
+# noqa: E711, W504
 
 """
 Persistence API implementation for postgres.
@@ -499,7 +500,8 @@ class PostgresDbAPI(object):
 
         recursive_query = base_query.union_all(
             select(
-                [col for col in base_query.columns if col.name not in ['source_dataset_ref', 'distance', 'path']] +
+                [col for col in base_query.columns
+                 if col.name not in ['source_dataset_ref', 'distance', 'path']] +  # noqa: W504
                 [DATASET_SOURCE.c.source_dataset_ref,
                  (base_query.c.distance + 1).label('distance'),
                  (base_query.c.path + '.' + DATASET_SOURCE.c.classifier).label('path')]
@@ -512,7 +514,7 @@ class PostgresDbAPI(object):
 
         return (
             select(
-                [distinct(recursive_query.c.id)] +
+                [distinct(recursive_query.c.id)] +  # noqa: W504
                 [col for col in recursive_query.columns
                  if col.name not in ['id', 'source_dataset_ref', 'distance', 'path']]
             ).select_from(

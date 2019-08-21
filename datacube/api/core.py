@@ -23,7 +23,6 @@ class TerminateCurrentLoad(Exception):
     """ This exception is raised by user code from `progress_cbk`
         to terminate currently running `.load`
     """
-    pass
 
 
 class Datacube(object):
@@ -480,7 +479,7 @@ class Datacube(object):
         def data_func(measurement):
             return _make_dask_array(chunked_srcs, dsk, gbt,
                                     measurement,
-                                    chunks=needed_irr_chunks+grid_chunks,
+                                    chunks=needed_irr_chunks + grid_chunks,
                                     skip_broken_datasets=skip_broken_datasets)
 
         return Datacube.create_storage(sources.coords, geobox, measurements, data_func)
@@ -494,7 +493,7 @@ class Datacube(object):
             if cbk is None:
                 return None
             n = 0
-            n_total = sum(len(x) for x in sources.values.ravel())*len(measurements)
+            n_total = sum(len(x) for x in sources.values.ravel()) * len(measurements)
 
             def _cbk(*ignored):
                 nonlocal n
@@ -842,10 +841,10 @@ def _make_dask_array(chunked_srcs,
 
             dsk[key_prefix + idx] = val
 
-    y_shapes = [grid_chunks[0]]*gbt.shape[0]
-    x_shapes = [grid_chunks[1]]*gbt.shape[1]
+    y_shapes = [grid_chunks[0]] * gbt.shape[0]
+    x_shapes = [grid_chunks[1]] * gbt.shape[1]
 
-    y_shapes[-1], x_shapes[-1] = gbt.chunk_shape(tuple(n-1 for n in gbt.shape))
+    y_shapes[-1], x_shapes[-1] = gbt.chunk_shape(tuple(n - 1 for n in gbt.shape))
 
     data = da.Array(dsk, dsk_name,
                     chunks=actual_irr_chunks + (tuple(y_shapes), tuple(x_shapes)),
@@ -863,4 +862,4 @@ def _needs_legacy_fallback(sources):
 
     ds = sources.values[0][0]
     is_s3aio_ds = ds.format == 'aio'
-    return True if is_s3aio_ds else False
+    return bool(is_s3aio_ds)
