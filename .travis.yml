@@ -13,8 +13,22 @@ env:
 matrix:
   fast_finish: false
 
+# Install required packages
+addons:
+  postgresql: "9.6"
+  apt: &apt-packages
+    sources:
+      - sourceline: ppa:nextgis/ppa
+    packages:
+      - gdal-bin
+      - gdal-data
+      - libgdal-dev
+      - libgdal20
+      - libudunits2-0
+
 jobs:
   include:
+# Perform some quick linting checks
     - stage: pretest
       python: 3.6
 
@@ -25,14 +39,18 @@ jobs:
       after_script: skip
       after_success: skip
 
+# Python 3.5
     - stage: test
       python: 3.5
       dist: trusty
       addons:
         postgresql: "9.5"
+        apt: *apt-packages
+
+# Python 3.6
     - python: 3.6
 
-      # Docker
+# Docker
     - language: generic
       env: DOCKER_BUILD=true
       before_install: skip
@@ -80,19 +98,6 @@ cache:
 services:
   - postgresql
   - redis-server
-
-# Install required packages
-addons:
-  postgresql: "9.6"
-  apt:
-    sources:
-      - sourceline: ppa:nextgis/ppa
-    packages:
-      - gdal-bin
-      - gdal-data
-      - libgdal-dev
-      - libgdal20
-      - libudunits2-0
 
 before_install:
 # Check disk usage
