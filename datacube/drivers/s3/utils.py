@@ -1,7 +1,6 @@
 """Utilities shared by all drivers."""
 
 
-
 class DriverUtils(object):
     """Constants shared by all drivers."""
 
