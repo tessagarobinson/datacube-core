@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import versioneer
-from setuptools import setup, find_packages
 import os
+
+from setuptools import setup, find_packages
 
 tests_require = [
     'compliance-checker',
@@ -44,8 +44,6 @@ if os.name != 'nt':
 
 setup(
     name='datacube',
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
     python_requires='>=3.5.2',
 
     url='https://github.com/opendatacube/datacube-core',
@@ -85,8 +83,9 @@ setup(
         'datacube_apps/scripts/pbs_helpers.sh'
     ],
     setup_requires=[
-        'pytest-runner'
+        'setuptools_scm'
     ],
+    use_scm_version=True,
     install_requires=[
         'affine',
         'cachetools',

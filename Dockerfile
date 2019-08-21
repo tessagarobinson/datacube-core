@@ -50,7 +50,7 @@ RUN pip3 install -r requirements-test.txt \
     && rm -rf $HOME/.cache/pip
 
 # Install ODC
-RUN python3 setup.py install
+RUN pip3 install .
 
 # Move docs and utils somewhere else, and remove the temp folder
 RUN mkdir -p /opt/odc \

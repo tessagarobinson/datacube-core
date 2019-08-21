@@ -3,7 +3,8 @@ import sys
 
 import subprocess
 
-import versioneer
+from pkg_resources import get_distribution
+__version = get_distribution('datacube').version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -12,19 +13,6 @@ sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 print(sys.path)
 
-current_dir = os.getcwd()
-os.chdir(os.path.dirname(versioneer.__file__))
-
-versioneer.VCS = 'git'
-versioneer.versionfile_source = '../datacube/_version.py'
-versioneer.versionfile_build = '../datacube/_version.py'
-versioneer.tag_prefix = 'datacube-'  # tags are like datacube-1.2.0
-versioneer.parentdir_prefix = '..'
-
-__version = versioneer.get_version().replace('.dirty', '')
-
-del versioneer
-os.chdir(current_dir)
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
