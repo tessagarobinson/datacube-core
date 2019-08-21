@@ -19,7 +19,7 @@ jobs:
       python: 3.6
 
       before_install: skip
-      install: skip
+      install: pip install pycodestyle yamllint pylint
       before_script: skip
       script: ./check-code.sh
       after_script: skip

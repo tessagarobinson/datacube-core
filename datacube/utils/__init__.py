@@ -21,7 +21,6 @@ _LOG = logging.getLogger(__name__)
 
 class DatacubeException(Exception):
     """Your Data Cube has malfunctioned"""
-    pass
 
 
 def schema_validated(schema):

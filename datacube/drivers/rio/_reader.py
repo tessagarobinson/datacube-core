@@ -34,7 +34,7 @@ Overrides = NamedTuple('Overrides', [('crs', Optional[CRS]),
                                      ('nodata', Optional[Union[float, int]])])
 
 RioWindow = Tuple[Tuple[int, int], Tuple[int, int]]  # pylint: disable=invalid-name
-T = TypeVar('T')
+T = TypeVar('T')  # pylint: disable=invalid-name
 
 
 def pick(a: Optional[T], b: Optional[T]) -> Optional[T]:
@@ -116,7 +116,7 @@ def _find_netcdf_band_by_time(src: DatasetReader, ts: datetime) -> int:
     ts0 = datetime_to_seconds_since_1970(ts)
 
     def get_ts() -> Iterator[Tuple[int, float]]:
-        for bidx in range(1, src.count+1):
+        for bidx in range(1, src.count + 1):
             tag_value = src.get_tag_item(time_tag, bidx=bidx)
             if tag_value is not None:
                 yield (bidx, float(tag_value))
@@ -163,9 +163,9 @@ class RIOReader(GeoRasterReader):
         self._src = src
         self._crs = overrides.crs or _dc_crs(src.crs)
         self._transform = transform
-        self._nodata = pick(overrides.nodata, src.nodatavals[band_idx-1])
+        self._nodata = pick(overrides.nodata, src.nodatavals[band_idx - 1])
         self._band_idx = band_idx
-        self._dtype = src.dtypes[band_idx-1]
+        self._dtype = src.dtypes[band_idx - 1]
         self._pool = pool
 
     @property
@@ -233,7 +233,7 @@ class RIORdrDriver(ReaderDriver):
     def new_load_context(self,
                          bands: Iterable[BandInfo],
                          old_ctx: Optional[Any]) -> Any:
-        return None  # TODO: implement file handle cache with this
+        return {}  # TODO: implement file handle cache with this
 
     def open(self, band: BandInfo, ctx: Any) -> FutureGeoRasterReader:
         return self._pool.submit(_rdr_open, band, ctx, self._pool)
