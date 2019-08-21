@@ -1,6 +1,5 @@
 * text=auto
 
-datacube/version.py  export-subst
 
 *.sh text eol=lf
 *.bash text eol=lf
@@ -12,4 +11,4 @@ datacube/version.py  export-subst
 *.bin binary
 *.tif binary
 
-datacube/_version.py export-subst
+.git_archival.txt export-subst
