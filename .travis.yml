@@ -32,6 +32,7 @@ jobs:
     - stage: pretest
       python: 3.6
 
+      addons: {}
       before_install: skip
       install: pip install pycodestyle yamllint pylint
       before_script: skip
