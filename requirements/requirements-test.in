@@ -1,4 +1,4 @@
--r requirements.txt
+-r requirements.in
 
 
 # Tests Require
@@ -33,5 +33,3 @@ boto3
 SharedArray
 pathos
 zstandard
-
-
