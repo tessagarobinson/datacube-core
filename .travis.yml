@@ -25,11 +25,13 @@ addons:
       - libgdal-dev
       - libgdal20
       - libudunits2-0
+      - libudunits2-dev
 
 jobs:
   include:
 # Perform some quick linting checks
     - stage: pretest
+      env: LINTING_CHECKS=t
       python: 3.6
 
       addons: {}
@@ -53,7 +55,7 @@ jobs:
 
 # Docker
     - language: generic
-      env: DOCKER_BUILD=true
+      env: DOCKER_BUILD=t
       before_install: skip
       install: docker build -t opendatacube:local .
       before_script: skip
