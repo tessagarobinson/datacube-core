@@ -1,0 +1,37 @@
+-r requirements.txt
+
+
+# Tests Require
+compliance-checker
+hypothesis
+mock
+pycodestyle
+pylint
+pytest
+pytest-cov
+pytest-timeout
+pytest-httpserver
+moto
+
+# Performance require
+ciso8601
+bottleneck
+
+# interactive
+matplotlib
+fiona
+
+# distributed
+dask[distributed]
+
+# celery
+celery>=4
+redis
+
+# s3
+boto3
+SharedArray
+pathos
+zstandard
+
+
