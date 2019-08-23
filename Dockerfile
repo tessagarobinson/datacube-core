@@ -46,7 +46,7 @@ RUN pip3 install --no-cache --no-binary :all: psycopg2==2.7.7 \
     && rm -rf $HOME/.cache/pip
 
 # Use the setup.py file to identify dependencies
-RUN pip3 install -r requirements/requirements-test.txt \
+RUN pip3 install -r requirements/requirements-test.py3.6.txt \
     && rm -rf $HOME/.cache/pip
 
 # Install ODC
