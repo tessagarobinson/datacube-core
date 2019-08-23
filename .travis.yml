@@ -122,7 +122,7 @@ before_install:
   - pip install --progress-bar off coveralls codecov
 # Install pygdal bindings compatible with dpkg based gdal libs
   - pip install GDAL=="$(gdal-config --version)"
-  - pip install --progress-bar off --requirement requirements/requirements-test.txt
+  - pip install --progress-bar off --requirement requirements/requirements-test.py${TRAVIS_PYTHON_VERSION}.txt
 
 
 install:
