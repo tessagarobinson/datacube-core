@@ -4,6 +4,9 @@
 #
 #    pip-compile --output-file=requirements-test.py3.5.txt requirements-test.in
 #
+--no-binary gdal
+--no-binary rasterio
+
 affine==2.2.2
 amqp==2.5.1               # via kombu
 antlr4-python3-runtime==4.7.2  # via cf-units
