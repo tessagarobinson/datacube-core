@@ -16,16 +16,16 @@ matrix:
 # Install required packages
 addons:
   postgresql: "9.6"
-  apt: &apt-packages
-    sources:
-      - sourceline: ppa:nextgis/ppa
-    packages:
-      - gdal-bin
-      - gdal-data
-      - libgdal-dev
-      - libgdal20
-      - libudunits2-0
-      - libudunits2-dev
+#  apt: &apt-packages
+#    sources:
+#      - sourceline: ppa:nextgis/ppa
+#    packages:
+#      - gdal-bin
+#      - gdal-data
+#      - libgdal-dev
+#      - libgdal20
+#      - libudunits2-0
+#      - libudunits2-dev
 
 jobs:
   include:
@@ -42,16 +42,17 @@ jobs:
       after_script: skip
       after_success: skip
 
-# Python 3.5
-    - stage: test
-      python: 3.5
-      dist: trusty
-      addons:
-        postgresql: "9.5"
-        apt: *apt-packages
-
-# Python 3.6
+## Python 3.5
+#    - stage: test
+#      python: 3.5
+#      dist: trusty
+#      addons:
+#        postgresql: "9.5"
+#        apt: *apt-packages
+#
     - python: 3.6
+
+	- python: 3.7
 
 # Docker
     - language: generic
@@ -104,26 +105,43 @@ services:
   - postgresql
   - redis-server
 
+#before_install:
+## Check disk usage
+#  - df -h
+#  - df -i
+#
+## Clean up AWS env variables
+#  - |
+#    [[ ! -v AWS_SECRET_ACCESS_KEY ]] && unset AWS_ACCESS_KEY_ID || true
+#
+## Set paths for building python-gdal
+#  - export CPLUS_INCLUDE_PATH=/usr/include/gdal
+#  - export C_INCLUDE_PATH=/usr/include/gdal
+#  - export GDAL_DATA="$(gdal-config --datadir)"
+#  - gdal-config --version
+#  - pip install --upgrade pip
+#  - pip install --progress-bar off coveralls codecov
+## Install pygdal bindings compatible with dpkg based gdal libs
+#  - pip install GDAL=="$(gdal-config --version)"
+#  - pip install --progress-bar off --requirement requirements/requirements-test.py${TRAVIS_PYTHON_VERSION}.txt
+
 before_install:
-# Check disk usage
-  - df -h
-  - df -i
+#  - sudo apt-get update
+  # We do this conditionally because it saves us some downloading if the
+  # version is the same.
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
 
-# Clean up AWS env variables
-  - |
-    [[ ! -v AWS_SECRET_ACCESS_KEY ]] && unset AWS_ACCESS_KEY_ID || true
-
-# Set paths for building python-gdal
-  - export CPLUS_INCLUDE_PATH=/usr/include/gdal
-  - export C_INCLUDE_PATH=/usr/include/gdal
-  - export GDAL_DATA="$(gdal-config --datadir)"
-  - gdal-config --version
-  - pip install --upgrade pip
-  - pip install --progress-bar off coveralls codecov
-# Install pygdal bindings compatible with dpkg based gdal libs
-  - pip install GDAL=="$(gdal-config --version)"
-  - pip install --progress-bar off --requirement requirements/requirements-test.py${TRAVIS_PYTHON_VERSION}.txt
-
+  # Replace dep1 dep2 ... with your dependencies
+#  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION dep1 dep2 ...
+  - conda create -n odc --file requirements/environment.defaults.yml
+  - source activate odc
 
 install:
 # Install datacube
