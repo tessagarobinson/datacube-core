@@ -51,9 +51,11 @@ jobs:
 #        apt: *apt-packages
 #
     - stage: test
-      python: 3.6
+      python: 3.7
+      env: CONDA_CHANNEL=default
 
     - python: 3.7
+      env: CONDA_CHANNEL=conda-forge
 
 # Docker
     - language: generic
@@ -141,7 +143,11 @@ before_install:
 
   # Replace dep1 dep2 ... with your dependencies
 #  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION dep1 dep2 ...
-  - conda create -n odc --file requirements/environment.defaults.yml
+  - if [[ "$CONDA_CHANNEL" == "default" ]]; then
+        conda env create -f requirements/environment.defaults.yml;
+    else
+        conda env create -f requirements/environment.cf.yml;
+    fi
   - source activate odc
 
 install:
