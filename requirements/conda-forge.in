@@ -1,0 +1,32 @@
+# See https://github.com/mapbox/rasterio/issues/1574#issuecomment-445996297
+# and https://github.com/rasterio/rasterio-wheels/issues/12#issuecomment-456944425
+#--no-binary rasterio,gdal
+
+affine
+click>=5.0
+cloudpickle>=0.4
+dask[array]
+
+# When installing on Travis-CI and in Docker, the GDAL python
+# library version must exactly match the GDAL library version installed
+# through apt-get. We handle this separately, so exclude gdal from
+# this requirements file.
+
+# gdal>=2.2,<3
+gdal
+
+jsonschema
+netcdf4
+numpy
+psycopg2
+python-dateutil
+pyyaml
+rasterio
+singledispatch
+sqlalchemy
+toolz
+xarray>=0.9  # >0.9 fixes most problems with `crs` attributes being lost
+
+pypeg2
+lark-parser>=0.6.7
+cachetools
