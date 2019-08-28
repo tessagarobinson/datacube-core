@@ -15,6 +15,6 @@ set +x
 if which yamllint;
 then
     set -x
-    yamllint $(find . \( -iname '*.yaml' -o -iname '*.yml' \) )
+    yamllint $(find . -path requirements -prune -o \( -iname '*.yaml' -o -iname '*.yml' \))
     set +x
 fi
