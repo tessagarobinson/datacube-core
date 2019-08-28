@@ -66,7 +66,8 @@ LCC2_PROJ = geometry.CRS("""PROJCS["unnamed",
                                PARAMETER["latitude_of_origin",12],
                                PARAMETER["central_meridian",-102],
                                PARAMETER["false_easting",2500000],
-                               PARAMETER["false_northing",0]]""")
+                               PARAMETER["false_northing",0],
+                               UNIT["Meter",1]]""")
 
 GLOBAL_ATTRS = {'test_attribute': 'test_value'}
 
