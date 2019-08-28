@@ -51,10 +51,10 @@ jobs:
 #        apt: *apt-packages
 #
     - stage: test
-      python: 3.7
+      python: 3.6
       env: CONDA_CHANNEL=default
 
-    - python: 3.7
+    - python: 3.6
       env: CONDA_CHANNEL=conda-forge
 
 # Docker
@@ -146,7 +146,7 @@ before_install:
   - if [[ "$CONDA_CHANNEL" == "default" ]]; then
         conda env create -f requirements/environment.defaults.yml;
     else
-        conda env create -f requirements/environment.cf.yml;
+        conda env create -f requirements/environment.conda-forge.3.6-2.4.yml;
     fi
   - source activate odc
 
