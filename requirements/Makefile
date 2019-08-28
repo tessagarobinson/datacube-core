@@ -28,6 +28,32 @@ requirements-test.py%.txt: requirements-test.in requirements.in
 conda-deps: environment.defaults.yml environment.cf.yml
 
 CONDA_ENV_NAME = odc
+
+pyversions := 3.6 3.7
+gdalversions := 2.4 3
+
+combo := $(foreach pyv,$(pyversions),$(foreach gdalv,$(gdalversions),$(pyv)-$(gdalv)))
+
+#all: environment.conda-forge.$(combo).yml
+all: $(foreach c,$(combo),environment.conda-forge.$(c).yml)
+
+$(combo):
+	docker build -t opendatacube/datacube-core:conda-forge-$@ -f docker/conda-forge/Dockerfile .
+
+environment.conda-forge.%.yml: conda-forge.in
+	cp $< $<.$*
+	$(eval PYV=$(firstword $(subst -, ,$*)))
+	$(eval GDALV=$(lastword $(subst -, ,$*)))
+	echo python=$(PYV)\* >> $<.$*
+	echo gdal=$(GDALV)\* >> $<.$*
+
+	docker run --rm -v $(CURDIR):/tmp/code -w /tmp/code continuumio/miniconda3 /bin/bash -lc "\
+		conda create -c conda-forge -n $(CONDA_ENV_NAME) --file $<.$* && \
+		conda env export -n $(CONDA_ENV_NAME) > $@.tmp && \
+		chown $(HOST_UID):$(HOST_GID) $@.tmp"
+	mv $@.tmp $@
+
+
 environment.defaults.yml: conda-defaults.in
 	docker run --rm -v $(CURDIR):/tmp/code -w /tmp/code continuumio/miniconda3 /bin/bash -lc "\
 		conda create -n $(CONDA_ENV_NAME) --file $<; \
@@ -36,12 +62,6 @@ environment.defaults.yml: conda-defaults.in
 		conda env export -n $(CONDA_ENV_NAME) > $@; \
 		chown $(HOST_UID):$(HOST_GID) $@"
 
-
-environment.cf.yml: conda-forge.in
-	docker run --rm -v $(CURDIR):/tmp/code -w /tmp/code continuumio/miniconda3 /bin/bash -lc "\
-		conda create -c conda-forge -n $(CONDA_ENV_NAME) --file $<; \
-		conda env export -n $(CONDA_ENV_NAME) > $@; \
-		chown $(HOST_UID):$(HOST_GID) $@"
 
 conda-shell:
 	docker run --rm -it -v $(CURDIR):/tmp/code -w /tmp/code continuumio/miniconda3 /bin/bash
