@@ -16,6 +16,6 @@ if which yamllint;
 then
     set -x
     # Exclude requirements specs for now
-    yamllint $(find . -path ./requirements -prune -o \( -iname '*.yaml' -o -iname '*.yml' \))
+    yamllint $(find . -path ./requirements -prune -type f -o \( -iname '*.yaml' -o -iname '*.yml' \))
     set +x
 fi
