@@ -150,6 +150,7 @@ install:
 
 before_script:
 # Create a database for the integration tests.
+  - ps aux
   - createdb odcintegration
 
 # Install Code Climate CLI
