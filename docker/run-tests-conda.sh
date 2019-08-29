@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/usr/bin/env bash -l
 
 conda activate odc
 conda install -y -c conda-forge compliance-checker hypothesis mock pytest pytest-cov pytest-timeout moto celery sharedarray redis-py pathos
