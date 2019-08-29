@@ -36,6 +36,9 @@ jobs:
     - stage: test
       python: 3.6
       env: _CONDA_CHANNEL=conda-forge  # Must use prefix underscore or miniconda install fails!
+      services:
+        - postgresql
+        - redis-server
 
 # Docker
     - language: generic
@@ -43,14 +46,14 @@ jobs:
       before_install: skip
       install: docker build -t opendatacube:local -f docker/ubuntu/Dockerfile .
       before_script: skip
-      script: ODC_TAG=local docker-compose -f docker-compose-test.yml run --rm odc
+      script: &docker-compose-script ODC_TAG=local docker-compose -f docker/docker-compose-test.yml run --rm odc
 
     - language: generic
       env: _DOCKER_BUILD=t _CONDA_BASED=t
       before_install: skip
       install: docker build -t opendatacube:local -f docker/conda-forge/Dockerfile .
       before_script: skip
-      script: ODC_TAG=local docker-compose -f docker/docker-compose-test.yml run --rm odc
+      script: *docker-compose-script
 
 # Deploy
     - stage: deploy
@@ -87,33 +90,7 @@ jobs:
             python: 3.6
             repo: opendatacube/datacube-core
 
-cache:
-  directories:
-    - $HOME/.cache/pip
 
-services:
-  - postgresql
-  - redis-server
-
-#before_install:
-## Check disk usage
-#  - df -h
-#  - df -i
-#
-## Clean up AWS env variables
-#  - |
-#    [[ ! -v AWS_SECRET_ACCESS_KEY ]] && unset AWS_ACCESS_KEY_ID || true
-#
-## Set paths for building python-gdal
-#  - export CPLUS_INCLUDE_PATH=/usr/include/gdal
-#  - export C_INCLUDE_PATH=/usr/include/gdal
-#  - export GDAL_DATA="$(gdal-config --datadir)"
-#  - gdal-config --version
-#  - pip install --upgrade pip
-#  - pip install --progress-bar off coveralls codecov
-## Install pygdal bindings compatible with dpkg based gdal libs
-#  - pip install GDAL=="$(gdal-config --version)"
-#  - pip install --progress-bar off --requirement requirements/requirements-test.py${TRAVIS_PYTHON_VERSION}.txt
 
 before_install:
 # Clean up AWS env variables
@@ -150,8 +127,7 @@ install:
 
 before_script:
 # Create a database for the integration tests.
-  - ps aux
-  - createdb odcintegration
+  - psql -c 'create database odcintegration;' -U postgres
 
 # Install Code Climate CLI
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -159,7 +135,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - pytest -r a --cov datacube --doctest-ignore-import-errors --durations=5 datacube tests datacube_apps integration_tests
+  - make test
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
