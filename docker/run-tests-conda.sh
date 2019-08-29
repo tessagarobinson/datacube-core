@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-set -euxo pipefile
+set -euxo pipefail
 
 conda activate odc
 pip install pytest-httpserver zstandard
