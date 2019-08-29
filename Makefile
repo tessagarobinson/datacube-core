@@ -1,5 +1,5 @@
 
-.PHONY: docker clean shell test-install
+.PHONY: docker clean shell test-install test
 
 pyversions := 3.6 3.7
 gdalversions := 2.4 3
@@ -17,6 +17,9 @@ clean:
 	rm -rf .hypothesis
 
 test:
+	pytest -r a --cov datacube --doctest-ignore-import-errors --durations=5 datacube tests datacube_apps integration_tests
+
+docker-test:
 	ODC_TAG=conda-forge docker-compose -f docker/docker-compose-test.yml run --rm odc
 
 shell:
