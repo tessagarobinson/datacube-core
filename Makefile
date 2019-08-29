@@ -6,11 +6,12 @@ gdalversions := 2.4 3
 
 combo := $(foreach pyv,$(pyversions),$(foreach gdalv,$(gdalversions),$(pyv)-$(gdalv)))
 
-_DOCKER_TAG ?= conda-forge
+export ODC_DOCKER_TAG ?= conda-forge
+
 
 
 docker:
-	docker build -t opendatacube/datacube-core:$(_DOCKER_TAG) -f docker/$(_DOCKER_TAG)/Dockerfile .
+	docker build -t opendatacube/datacube-core:$(ODC_DOCKER_TAG) -f docker/$(ODC_DOCKER_TAG)/Dockerfile .
 
 docker-test:
 	docker-compose -f docker/docker-compose-test.yml run --rm odc
@@ -30,3 +31,6 @@ shell:
 test-install:
 	pip install '.[test,celery,s3]'
 	pip install ./tests/drivers/fail_drivers --no-deps --upgrade
+
+update-deps:
+	$(MAKE) -C requirements environment.conda-forge.3.6-2.4.yml

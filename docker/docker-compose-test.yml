@@ -14,7 +14,7 @@ services:
       - POSTGRES_PASSWORD=opendatacubepassword
 
   odc:
-    image: opendatacube/datacube-core:${_DOCKER_TAG}
+    image: opendatacube/datacube-core:${ODC_DOCKER_TAG}
     depends_on:
       - postgres
     environment:
@@ -26,4 +26,4 @@ services:
     #    command: pytest -m "not netcdf and not s3aio" -r a --cov datacube --durations=5 tests integration_tests --odc-config-file odcintegration-docker.conf
     command: docker/run-tests-conda.sh
     volumes:
-      - ../:/tmp/code
+        - ../:/tmp/code
