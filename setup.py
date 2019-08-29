@@ -8,8 +8,6 @@ tests_require = [
     'compliance-checker',
     'hypothesis',
     'mock',
-    'pycodestyle',
-    'pylint',
     'pytest',
     'pytest-cov',
     'pytest-timeout',
