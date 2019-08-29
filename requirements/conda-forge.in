@@ -16,3 +16,16 @@ xarray
 pypeg2
 lark-parser
 cachetools
+
+# for tests
+cfunits
+SharedArray
+pathos
+zstandard
+celery
+pytest
+pytest-cov
+pytest-timeout
+boto3
+moto
+compliance-checker
