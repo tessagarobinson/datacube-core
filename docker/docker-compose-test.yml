@@ -14,7 +14,7 @@ services:
       - POSTGRES_PASSWORD=opendatacubepassword
 
   odc:
-    image: opendatacube/datacube-core:${ODC_TAG}
+    image: opendatacube/datacube-core:${_DOCKER_TAG}
     depends_on:
       - postgres
     environment:
