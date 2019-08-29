@@ -373,15 +373,12 @@ def test_read_docs_from_file_uris(sample_document_files):
     _test_read_docs_impl(uris)
 
 
-def test_read_docs_from_s3(sample_document_files, monkeypatch):
+def test_read_docs_from_s3(sample_document_files):
     """
     Use a mocked S3 bucket to test reading documents from S3
     """
     boto3 = pytest.importorskip('boto3')
     moto = pytest.importorskip('moto')
-
-    monkeypatch.setenv('AWS_ACCESS_KEY_ID', 'fake')
-    monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'fake')
 
     with moto.mock_s3():
         s3 = boto3.resource('s3', region_name='us-east-1')
