@@ -52,10 +52,10 @@ jobs:
 #
     - stage: test
       python: 3.6
-      env: CONDA_CHANNEL=default
+      env: _CONDA_CHANNEL=default  # Must use prefix underscore or miniconda install fails!
 
-    - python: 3.6
-      env: CONDA_CHANNEL=conda-forge
+#    - python: 3.6
+#      env: _CONDA_CHANNEL=conda-forge  # Must use prefix underscore or miniconda install fails!
 
 # Docker
     - language: generic
