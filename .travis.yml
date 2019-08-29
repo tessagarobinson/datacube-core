@@ -59,11 +59,18 @@ jobs:
 
 # Docker
     - language: generic
-      env: DOCKER_BUILD=t
+      env: _DOCKER_BUILD=t _UBUNTU_BASED=t
       before_install: skip
-      install: docker build -t opendatacube:local .
+      install: docker build -t opendatacube:local -f docker/ubuntu/Dockerfile .
       before_script: skip
-      script: docker-compose -f docker-compose-test.yml run --rm odc
+      script: ODC_TAG=local docker-compose -f docker-compose-test.yml run --rm odc
+
+    - language: generic
+      env: _DOCKER_BUILD=t _CONDA_BASED=t
+      before_install: skip
+      install: docker build -t opendatacube:local -f docker/ubuntu/Dockerfile .
+      before_script: skip
+      script: ODC_TAG=local docker-compose -f docker-compose-test.yml run --rm odc
 
 # Deploy
     - stage: deploy
@@ -132,7 +139,7 @@ before_install:
 #  - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
