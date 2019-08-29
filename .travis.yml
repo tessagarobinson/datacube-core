@@ -91,7 +91,6 @@ jobs:
             repo: opendatacube/datacube-core
 
 
-
 before_install:
 # Clean up AWS env variables
   - |
