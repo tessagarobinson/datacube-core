@@ -14,8 +14,12 @@ matrix:
   fast_finish: false
 
 # Install required packages
-addons:
-  postgresql: "9.6"
+#addons:
+#  postgresql: "9.6"
+
+services:
+  - postgresql
+  - redis-server
 
 jobs:
   include:
@@ -31,27 +35,23 @@ jobs:
       script: ./check-code.sh
       after_script: skip
       after_success: skip
-      services: skip
 
     - stage: test
       python: 3.6
       env: _CONDA_CHANNEL=conda-forge  # Must use prefix underscore or miniconda install fails!
-      services:
-        - postgresql
-        - redis-server
 
 # Docker
     - language: generic
       env: _DOCKER_BUILD=t _UBUNTU_BASED=t
       before_install: skip
-      install: docker build -t opendatacube:local -f docker/ubuntu/Dockerfile .
+      install: docker build -t opendatacube/datacube-core:local -f docker/ubuntu/Dockerfile .
       before_script: skip
       script: &docker-compose-script ODC_TAG=local docker-compose -f docker/docker-compose-test.yml run --rm odc
 
     - language: generic
       env: _DOCKER_BUILD=t _CONDA_BASED=t
       before_install: skip
-      install: docker build -t opendatacube:local -f docker/conda-forge/Dockerfile .
+      install: docker build -t opendatacube/datacube-core:local -f docker/conda-forge/Dockerfile .
       before_script: skip
       script: *docker-compose-script
 
