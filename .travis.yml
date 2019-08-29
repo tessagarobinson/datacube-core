@@ -42,12 +42,14 @@ jobs:
       env: _DOCKER_TAG=conda-forge
       before_install: skip
       before_script: skip
+      install: skip
       script: make docker docker-test
 
     - language: generic
       env: _DOCKER_TAG=ubuntu
       before_install: skip
       before_script: skip
+      install: skip
       script: make docker docker-test
 
 # Deploy
