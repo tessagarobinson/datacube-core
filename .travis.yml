@@ -16,16 +16,6 @@ matrix:
 # Install required packages
 addons:
   postgresql: "9.6"
-#  apt: &apt-packages
-#    sources:
-#      - sourceline: ppa:nextgis/ppa
-#    packages:
-#      - gdal-bin
-#      - gdal-data
-#      - libgdal-dev
-#      - libgdal20
-#      - libudunits2-0
-#      - libudunits2-dev
 
 jobs:
   include:
@@ -41,21 +31,11 @@ jobs:
       script: ./check-code.sh
       after_script: skip
       after_success: skip
+      services: skip
 
-## Python 3.5
-#    - stage: test
-#      python: 3.5
-#      dist: trusty
-#      addons:
-#        postgresql: "9.5"
-#        apt: *apt-packages
-#
     - stage: test
       python: 3.6
-      env: _CONDA_CHANNEL=default  # Must use prefix underscore or miniconda install fails!
-
-#    - python: 3.6
-#      env: _CONDA_CHANNEL=conda-forge  # Must use prefix underscore or miniconda install fails!
+      env: _CONDA_CHANNEL=conda-forge  # Must use prefix underscore or miniconda install fails!
 
 # Docker
     - language: generic
@@ -68,9 +48,9 @@ jobs:
     - language: generic
       env: _DOCKER_BUILD=t _CONDA_BASED=t
       before_install: skip
-      install: docker build -t opendatacube:local -f docker/ubuntu/Dockerfile .
+      install: docker build -t opendatacube:local -f docker/conda-forge/Dockerfile .
       before_script: skip
-      script: ODC_TAG=local docker-compose -f docker-compose-test.yml run --rm odc
+      script: ODC_TAG=local docker-compose -f docker/docker-compose-test.yml run --rm odc
 
 # Deploy
     - stage: deploy
@@ -136,6 +116,9 @@ services:
 #  - pip install --progress-bar off --requirement requirements/requirements-test.py${TRAVIS_PYTHON_VERSION}.txt
 
 before_install:
+# Clean up AWS env variables
+  - |
+    [[ ! -v AWS_SECRET_ACCESS_KEY ]] && unset AWS_ACCESS_KEY_ID || true
 #  - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
@@ -150,7 +133,7 @@ before_install:
 
   # Replace dep1 dep2 ... with your dependencies
 #  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION dep1 dep2 ...
-  - if [[ "$CONDA_CHANNEL" == "default" ]]; then
+  - if [[ "$_CONDA_CHANNEL" == "default" ]]; then
         conda env create -f requirements/environment.defaults.yml;
     else
         conda env create -f requirements/environment.conda-forge.3.6-2.4.yml;
