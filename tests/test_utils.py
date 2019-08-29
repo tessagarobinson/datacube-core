@@ -393,9 +393,6 @@ def test_read_docs_from_s3(sample_document_files):
     boto3 = pytest.importorskip('boto3')
     moto = pytest.importorskip('moto')
 
-    os.environ['AWS_ACCESS_KEY_ID'] = 'fake'
-    os.environ['AWS_SECRET_ACCESS_KEY'] = 'fake'
-
     with moto.mock_s3():
         s3 = boto3.resource('s3', region_name='us-east-1')
         bucket = s3.create_bucket(Bucket='mybucket')
