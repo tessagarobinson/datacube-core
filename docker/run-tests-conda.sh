@@ -1,6 +1,7 @@
 #!/bin/bash -l
 
-set -euxo pipefail
+#set -euxo pipefail # Can't use this, 'conda activate' has unbound variables
+set -x
 
 conda activate odc
 pip install pytest-httpserver zstandard
