@@ -29,3 +29,5 @@ pytest-timeout
 boto3
 moto
 compliance-checker
+redis-py
+cython #why?
