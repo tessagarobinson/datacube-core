@@ -74,10 +74,10 @@ def test_index_out_of_bound_error(clirunner, index, tmpdir, example_ls5_dataset_
     with netCDF4.Dataset(ds_path) as nco:
         check_data_shape(nco)
         check_grid_mapping(nco)
-        check_cf_compliance(nco)
         check_dataset_metadata_in_storage_unit(nco, example_ls5_dataset_paths)
         check_attributes(nco, config['global_attributes'])
 
         name = config['measurements'][0]['name']
         check_attributes(nco[name], config['measurements'][0]['attrs'])
+    check_cf_compliance(ds_path)
     check_open_with_xarray(ds_path)

@@ -57,12 +57,12 @@ def test_full_ingestion(clirunner, index, tmpdir, example_ls5_dataset_paths, ing
     with netCDF4.Dataset(ds_path) as nco:
         check_data_shape(nco)
         check_grid_mapping(nco)
-        check_cf_compliance(nco)
         check_dataset_metadata_in_storage_unit(nco, example_ls5_dataset_paths)
         check_attributes(nco, config['global_attributes'])
 
         name = config['measurements'][0]['name']
         check_attributes(nco[name], config['measurements'][0]['attrs'])
+    check_cf_compliance(ds_path)
     check_open_with_xarray(ds_path)
 
 
@@ -155,12 +155,12 @@ def test_process_all_ingest_jobs(clirunner, index, tmpdir, example_ls5_dataset_p
     with netCDF4.Dataset(ds_path) as nco:
         check_data_shape(nco)
         check_grid_mapping(nco)
-        check_cf_compliance(nco)
         check_dataset_metadata_in_storage_unit(nco, example_ls5_dataset_paths)
         check_attributes(nco, config['global_attributes'])
 
         name = config['measurements'][0]['name']
         check_attributes(nco[name], config['measurements'][0]['attrs'])
+    check_cf_compliance(ds_path)
     check_open_with_xarray(ds_path)
 
 
@@ -183,7 +183,7 @@ def check_data_shape(nco):
     assert nco.variables['blue'].shape == EXPECTED_STORAGE_UNIT_DATA_SHAPE
 
 
-def check_cf_compliance(dataset):
+def check_cf_compliance(ds_path):
     try:
         from compliance_checker.runner import CheckSuite, ComplianceChecker
         import compliance_checker
@@ -193,17 +193,12 @@ def check_cf_compliance(dataset):
 
     cs = CheckSuite()
     cs.load_all_available_checkers()
-    if compliance_checker.__version__ >= '2.3.0':
-        # This skips a failing compliance check. Our files don't contain all the lats/lons
-        # as an auxiliary cordinate var as it's unnecessary for any software we've tried.
-        # It may be added at some point in the future, and this check should be re-enabled.
-        score_groups = cs.run(dataset, ['check_dimension_order'], 'cf')
-    else:
+    checker_names = ['cf', 'acdd']
+    if compliance_checker.__version__ <= '2.3.0':
         warnings.warn('Please upgrade to compliance-checker 2.3.0 or higher.')
-        score_groups = cs.run(dataset, 'cf')
 
-    groups = ComplianceChecker.stdout_output(cs, score_groups, verbose=1, limit=COMPLIANCE_CHECKER_NORMAL_LIMIT)
-    assert cs.passtree(groups, limit=COMPLIANCE_CHECKER_NORMAL_LIMIT)
+    groups, errors = ComplianceChecker.run_checker(ds_path, checker_names, verbose=1, criteria='normal')
+    assert not errors
 
 
 def check_attributes(obj, attrs):
