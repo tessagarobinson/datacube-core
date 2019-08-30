@@ -123,13 +123,13 @@ class DatasetResource(BaseDatasetResource):
         """
         # Build regular indices as list of triple scalars (as
         # numpy types are not accepted by sqlalchemy)
-        regular_indices = [list(map(np.asscalar, index))
+        regular_indices = [[i.item() for i in index]
                            for index in output['regular_index'] if index is not None]
 
         # Build irregular indices list, padding them all to
         # the same size as required by Postgres
         # multidimensional arrays
-        irregular_indices = [list(map(np.asscalar, index))
+        irregular_indices = [[i.item() for i in index]
                              for index in output['irregular_index'] if index is not None]
         if irregular_indices:
             irregular_max_size = max(map(len, irregular_indices))
@@ -167,8 +167,8 @@ class DatasetResource(BaseDatasetResource):
         for key_map in output['key_maps']:
             micro_shape = [chunk_dim.stop - chunk_dim.start for chunk_dim in key_map['chunk']]
             # Convert index_min and index_max to scalars
-            index_min = list(map(np.asscalar, key_map['index_min']))
-            index_max = list(map(np.asscalar, key_map['index_max']))
+            index_min = [i.item() for i in key_map['index_min']]
+            index_max = [i.item() for i in key_map['index_max']]
 
             _LOG.debug('put_s3_dataset_chunk(%s, %s, %s, %s, %s, %s, %s)',
                        s3_dataset_id, key_map['s3_key'],
