@@ -66,4 +66,10 @@ if [ "$DB_PORT" ]; then
     echo "db_port: $DB_PORT" >> $CONF_FILE
 fi
 
+if [[ command -v conda ]]; then
+    echo Activating ODC conda environment
+    conda activate odc
+fi
+
+
 exec "$@"
