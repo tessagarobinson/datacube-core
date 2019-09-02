@@ -18,6 +18,8 @@ RUN conda env create -f requirements/environment.conda-forge.3.6-2.4.yml
 SHELL ["/bin/bash", "-cl"]
 RUN conda activate odc && pip install .
 
+RUN sed -i 's/conda activate base/conda activate odc/g' ~/.bashrc
+
 # Move docs and utils somewhere else, and remove the temp folder
 RUN mkdir -p /opt/odc \
     && chmod +rwx /opt/odc \
