@@ -3,8 +3,7 @@ FROM continuumio/miniconda3
 
 # Get the code, and put it in /code
 ENV APPDIR=/tmp/code
-RUN mkdir -p $APPDIR
-COPY . $APPDIR
+COPY requirements/environment.conda-forge.3.6-2.4.yml $APPDIR/requirements/
 WORKDIR $APPDIR
 
 
@@ -20,17 +19,18 @@ RUN conda activate odc && pip install .
 
 RUN sed -i 's/conda activate base/conda activate odc/g' ~/.bashrc
 
+COPY . $APPDIR
 # Move docs and utils somewhere else, and remove the temp folder
 RUN mkdir -p /opt/odc \
     && chmod +rwx /opt/odc \
     && mv $APPDIR/utils /opt/odc/ \
     && mv $APPDIR/docs /opt/odc/ \
-    && mv $APPDIR/docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
+    && mv $APPDIR/docker/datacube-config-entrypoint.sh /usr/local/bin/datacube-config-entrypoint.sh \
     && rm -rf $APPDIR
 
 
 # Set up an entrypoint that drops environment variables into the config file
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["datacube-config-entrypoint.sh"]
 
 WORKDIR /opt/odc
 CMD ["datacube","--help"]

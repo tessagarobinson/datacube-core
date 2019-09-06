@@ -29,8 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Get the code, and put it in /code
 ENV APPDIR=/tmp/code
-RUN mkdir -p $APPDIR
-COPY . $APPDIR
+COPY requirements/requirements-test.py3.6.txt $APPDIR/requirements/
 WORKDIR $APPDIR
 
 # Set the locale, this is required for some of the Python packages
@@ -49,6 +48,7 @@ RUN pip3 install --no-cache --no-binary :all: psycopg2==2.7.7 \
 RUN pip3 install -r requirements/requirements-test.py3.6.txt \
     && rm -rf $HOME/.cache/pip
 
+COPY . $APPDIR
 # Install ODC
 RUN pip3 install .
 
@@ -57,7 +57,7 @@ RUN mkdir -p /opt/odc \
     && chmod +rwx /opt/odc \
     && mv $APPDIR/utils /opt/odc/ \
     && mv $APPDIR/docs /opt/odc/ \
-    && mv $APPDIR/docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
+    && mv $APPDIR/docker/datacube-config-entrypoint.sh /usr/local/bin/datacube-config-entrypoint.sh \
     && rm -rf $APPDIR
 
 # Fix an issue with libcurl...
@@ -65,7 +65,7 @@ RUN mkdir -p /etc/pki/tls/certs \
     && ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt;
 
 # Set up an entrypoint that drops environment variables into the config file
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["datacube-config-entrypoint.sh"]
 
 WORKDIR /opt/odc
 CMD ["datacube","--help"]
