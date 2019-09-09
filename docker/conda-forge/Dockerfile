@@ -13,7 +13,8 @@ ENV LC_ALL C.UTF-8
 
 RUN conda config --add channels conda-forge \
     && conda config --set channel_priority strict
-RUN conda env create -f requirements/environment.conda-forge.3.6-2.4.yml
+RUN conda env create -f requirements/environment.conda-forge.3.6-2.4.yml \
+    && conda clean -ay
 
 SHELL ["/bin/bash", "-cl"]
 RUN conda activate odc && pip install .
