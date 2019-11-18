@@ -1,28 +1,39 @@
+import datetime
 import uuid
 from itertools import groupby
 from typing import Union, Optional, Dict, Tuple
-import datetime
 
 import numpy
 import xarray
 from dask import array as da
 
 from datacube.config import LocalConfig
+from datacube.model.utils import xr_apply
 from datacube.storage import reproject_and_fuse, BandInfo
 from datacube.utils import geometry
 from datacube.utils.geometry import intersects, GeoBox
 from datacube.utils.geometry.gbox import GeoboxTiles
-from datacube.model.utils import xr_apply
-
 from .query import Query, query_group_by, query_geopolygon
-from ..index import index_connect
 from ..drivers import new_datasource
+from ..index import index_connect
 
 
 class TerminateCurrentLoad(Exception):
     """ This exception is raised by user code from `progress_cbk`
         to terminate currently running `.load`
     """
+
+
+from contextlib import contextmanager
+import time
+
+
+@contextmanager
+def odc_timer(msg):
+    start = time.perf_counter()
+    yield
+    end = time.perf_counter()
+    print(f'{msg:15.15} took: {end - start:.5f}')
 
 
 class Datacube(object):
@@ -344,11 +355,16 @@ class Datacube(object):
         if not query.product:
             raise ValueError("must specify a product")
 
-        datasets = self.index.datasets.search(limit=limit,
-                                              **query.search_terms)
+        with odc_timer('database results'):
+            datasets = self.index.datasets.search(limit=limit,
+                                                  **query.search_terms)
+            datasets = list(datasets)
+            print(f'DB returned {len(datasets)}')
 
         if query.geopolygon is not None:
-            datasets = select_datasets_inside_polygon(datasets, query.geopolygon)
+            with odc_timer('select_datasets_inside_polygon'):
+                datasets = select_datasets_inside_polygon(datasets, query.geopolygon)
+                datasets = list(datasets)
 
         if ensure_location:
             datasets = (dataset for dataset in datasets if dataset.uris)
@@ -499,6 +515,7 @@ class Datacube(object):
                 nonlocal n
                 n += 1
                 return cbk(n, n_total)
+
             return _cbk
 
         data = Datacube.create_storage(sources.coords, geobox, measurements)
@@ -774,7 +791,7 @@ def _calculate_chunk_sizes(sources: xarray.DataArray,
 
     # defaults: 1 for non-spatial, whole dimension for Y/X
     chunk_defaults = dict(**{dim: 1 for dim in sources.dims},
-                          **{dim: -1 for dim in geobox.dimensions})   # type: Dict[str, int]
+                          **{dim: -1 for dim in geobox.dimensions})  # type: Dict[str, int]
 
     def _resolve(k, v: Optional[Union[str, int]]) -> int:
         if v is None or v == "auto":
