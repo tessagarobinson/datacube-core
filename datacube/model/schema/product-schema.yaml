@@ -1,5 +1,5 @@
 "$schema": "http://json-schema.org/draft-04/schema#"
-description: Schema for dataset types.
+description: Schema for Products.
 type: object
 properties:
     name:
@@ -98,7 +98,7 @@ definitions:
           - dtype
           - nodata
           - units
-        additionalProperties: false
+        additionalProperties: true
 
     storage:
         type: object

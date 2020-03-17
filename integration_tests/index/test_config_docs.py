@@ -333,7 +333,7 @@ def test_product_update_cli(index: Index,
     assert get_current(index, ls5_telem_doc) == ls5_telem_doc
     assert result.exit_code == 0
 
-    # Try to add an unknown property: this should be forbidden by validation of dataset-type-schema.yaml
+    # Try to add an unknown property: this should be forbidden by validation of product-schema.yaml
     modified_doc = copy.deepcopy(ls5_telem_doc)
     modified_doc['newly_added_property'] = {}
     file_path = tmpdir.join('invalid-product.yaml')

@@ -380,7 +380,7 @@ class MetadataType(object):
         return str(self)
 
 
-@schema_validated(SCHEMA_PATH / 'dataset-type-schema.yaml')
+@schema_validated(SCHEMA_PATH / 'product-schema.yaml')
 class DatasetType(object):
     """
     Product definition
