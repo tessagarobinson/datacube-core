@@ -12,11 +12,24 @@ are specified the same as when using the API to search for datasets.
 
 .. code-block:: yaml
 
-    remote_host: raijin.nci.org.auo
-    remote_user: dra547
-    db_password: xxxxxxxxxxxx
+    use_ssh: #optional
+        host: gadi.nci.org.au
+        user: dra547
+
+    remote_config:
+        db_username: xxxxx
+        db_password: xxxxxxxxxxxx
+        db_hostname: 130.56.244.105
+        db_port: 6432
+        db_database: datacube
+
+    local_config:
+        db_hostname: localhost
+        db_port: 5432
+        db_database: datacube
+
     remote_dir: /g/data/
-    local_dir: C:/datacube/
+    local_dir: /home/omad/gdata/
 
     replicated_data:
     - product: ls5_pq_albers
@@ -84,6 +97,8 @@ class DatacubeReplicator(object):
         self.connect()
         self.read_remote_config()
         self.connect_to_db()
+        self.replicate_all_metadata_types()
+        self.replicate_all_products()
         self.replicate_all()
         self.disconnect()
 
@@ -104,7 +119,7 @@ class DatacubeReplicator(object):
     def read_remote_config(self):
         remote_config = ConfigParser()
         remote_config.read_string(_DEFAULT_CONF)
-        with self.sftp.open('.datacube.conf') as fin:
+        with self.sftp.open('/g/data/v10/public/modules/dea/unstable/datacube.conf') as fin:
             remote_config.read_file(fin)
         self.remote_dc_config = LocalConfig(remote_config)
 
@@ -112,7 +127,7 @@ class DatacubeReplicator(object):
         self.tunnel = SSHTunnelForwarder(
             self.remote_host,
             ssh_username=self.remote_user,
-            remote_bind_address=(self.remote_dc_config.db_hostname, int(self.remote_dc_config.db_port)))
+            remote_bind_address=(self.remote_dc_config['db_hostname'], int(self.remote_dc_config['db_port'])))
         self.tunnel.start()
 
         # pylint: disable=protected-access
@@ -133,9 +148,14 @@ class DatacubeReplicator(object):
         for defn in tqdm(self.replication_defns, 'Replicating products'):
             self.replicate(defn)
 
+    def replicate_all_metadata_types(self):
+        mdts = list(self.remote_dc.index.metadata_types.get_all())
+        for mdt in tqdm(mdts, 'Replicating metadata types'):
+            self.local_index.metadata_types.add(mdt)
+
     def replicate_all_products(self):
-        products = self.remote_dc.index.products.get_all()
-        for product in products:
+        products = list(self.remote_dc.index.products.get_all())
+        for product in tqdm(products, 'Replicating products'):
             self.local_index.products.add(product)
 
     def replicate(self, defn):
@@ -148,6 +168,7 @@ class DatacubeReplicator(object):
         # TODO: use generator not list
         product = datasets[0].type
         LOG.info('Ensuring remote product is in local index. %s', product)
+        # TODO: if all products are copied, this is not necessary
 
         self.local_index.products.add(product)
 
@@ -166,9 +187,16 @@ class DatacubeReplicator(object):
 
             # Download file
             self.sftp.get(remote_path, local_path)
+            # TODO: This works for NetCDF, not for multi-file datasets
 
             # Add to local index
-            dataset.local_uri = 'file://' + local_path
+            # Update URI
+            dataset.uris = ['file://' + local_path]
+            # Use a local copy of the product, with correct database ids
+            # TODO: Optimise, maybe
+            local_prod = self.local_index.products.get_by_name(dataset.type.name)
+            dataset.type = local_prod
+            # import pdb; pdb.set_trace()
             self.local_index.datasets.add(dataset)
             LOG.debug('Downloaded to %s', local_path)
 
@@ -192,7 +220,7 @@ def replicate(config_path):
         config_path = DEFAULT_REPLICATION_CONFIG
     LOG.debug('Config path: %s', config_path)
     with open(config_path) as fin:
-        config = yaml.load(fin)
+        config = yaml.safe_load(fin)
 
     replicate_data(config)
 
