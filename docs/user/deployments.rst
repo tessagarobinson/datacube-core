@@ -17,7 +17,7 @@ If you are using `Digital Earth Australia`_ at the :term:`NCI`, see the
 
 Digital Earth Africa
 --------------------
-http://www.ga.gov.au/digitalearthafrica
+http://www.digitalearthafrica.org
 
 Swiss Data Cube
 ---------------
